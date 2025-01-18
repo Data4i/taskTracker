@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/aquasecurity/table"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -43,31 +44,25 @@ func (tasks *Tasks) updateDescription(idx int, description string) error {
 	return nil
 }
 
-func (tasks *Tasks) updateStatusInProgress(idx int) error {
+func (tasks *Tasks) updateStatus(idx int, status string) error {
 	t := *tasks
+
 	if err := t.validateTask(idx); err != nil {
 		return err
 	}
-	if t[idx].Status == "In Progress" {
-		fmt.Println("Task is already In Progress")
+
+	if t[idx].Status == status {
+		fmt.Printf("Task is aready %s", status)
+		return nil
 	}
 
-	t[idx].Status = "In Progress"
-	fmt.Printf("Task %s is now In Progress", t[idx].Description)
-	return nil
-}
-
-func (tasks *Tasks) updateStatusDone(idx int) error {
-	t := *tasks
-	if err := t.validateTask(idx); err != nil {
-		return err
-	}
-	if t[idx].Status == "Done" {
-		fmt.Println("Task is already done")
+	switch status {
+	case "In Progress":
+		t[idx].Status = "Done"
+	case "Done":
+		t[idx].Status = "In Progress"
 	}
 
-	t[idx].Status = "Done"
-	fmt.Printf("Task %s is done", t[idx].Description)
 	return nil
 }
 
@@ -91,6 +86,6 @@ func (tasks *Tasks) print() {
 		if task.UpdatedAt != nil {
 			updatedAt = task.UpdatedAt.Format(time.RFC1123)
 		}
-		taskTable.AddRow(idx, task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+		taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
 	}
 }
