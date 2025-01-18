@@ -21,7 +21,7 @@ type Tasks []Task
 func (tasks *Tasks) add(description string) {
 	task := Task{
 		Description: description,
-		Status:      "In Progress",
+		Status:      "Todo",
 		CreatedAt:   time.Now(),
 		UpdatedAt:   nil,
 	}
@@ -75,17 +75,35 @@ func (tasks *Tasks) delete(idx int) error {
 	return nil
 }
 
-func (tasks *Tasks) print() {
+func (tasks *Tasks) print(taskStatus string) {
 	taskTable := table.New(os.Stdout)
 	taskTable.SetRowLines(false)
 	taskTable.SetHeaders("#", "Description", "Status", "CreatedAt", "UpdatedAt")
 
 	for idx, task := range *tasks {
-
 		updatedAt := ""
+
 		if task.UpdatedAt != nil {
 			updatedAt = task.UpdatedAt.Format(time.RFC1123)
 		}
-		taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+
+		switch taskStatus {
+		case "In Progress":
+			if task.Status == "In Progress" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+			}
+		case "Done":
+			if task.Status == "Done" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+			}
+		case "Todo":
+			if task.Status == "Todo" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+			}
+		case "":
+			taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
+		default:
+			fmt.Println("Invalid task status command")
+		}
 	}
 }
