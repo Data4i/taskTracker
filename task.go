@@ -18,7 +18,7 @@ type Task struct {
 
 type Tasks []Task
 
-func (tasks *Tasks) add(description string) {
+func (tasks *Tasks) Add(description string) {
 	task := Task{
 		Description: description,
 		Status:      "Todo",
@@ -28,26 +28,33 @@ func (tasks *Tasks) add(description string) {
 	*tasks = append(*tasks, task)
 }
 
-func (tasks *Tasks) validateTask(idx int) error {
+func (tasks *Tasks) ValidateTask(idx int) error {
 	if idx < 0 || idx >= len(*tasks) {
 		return errors.New("invalid task index")
 	}
 	return nil
 }
 
-func (tasks *Tasks) updateDescription(idx int, description string) error {
+func (tasks *Tasks) UpdateDescription(idx int, description string) error {
 	t := *tasks
-	if err := t.validateTask(idx); err != nil {
+	if err := t.ValidateTask(idx); err != nil {
 		return err
 	}
+
+	updateTime := time.Now()
+	t[idx].UpdatedAt = &updateTime
+
 	t[idx].Description = description
 	return nil
 }
 
-func (tasks *Tasks) updateStatus(idx int, status string) error {
+func (tasks *Tasks) UpdateStatus(idx int, status string) error {
 	t := *tasks
 
-	if err := t.validateTask(idx); err != nil {
+	updateTime := time.Now()
+	t[idx].UpdatedAt = &updateTime
+
+	if err := t.ValidateTask(idx); err != nil {
 		return err
 	}
 
@@ -58,9 +65,9 @@ func (tasks *Tasks) updateStatus(idx int, status string) error {
 
 	switch status {
 	case "In Progress":
-		t[idx].Status = "Done"
-	case "Done":
 		t[idx].Status = "In Progress"
+	case "Done":
+		t[idx].Status = "Done"
 	}
 
 	return nil
@@ -68,7 +75,7 @@ func (tasks *Tasks) updateStatus(idx int, status string) error {
 
 func (tasks *Tasks) delete(idx int) error {
 	t := *tasks
-	if err := t.validateTask(idx); err != nil {
+	if err := t.ValidateTask(idx); err != nil {
 		return err
 	}
 	*tasks = append(t[:idx], t[idx+1:]...)
@@ -106,4 +113,5 @@ func (tasks *Tasks) print(taskStatus string) {
 			fmt.Println("Invalid task status command")
 		}
 	}
+	taskTable.Render()
 }
