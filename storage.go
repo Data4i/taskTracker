@@ -3,49 +3,34 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"time"
 )
 
 type Storage[T any] struct {
 	FileName string
 }
 
-func NewStorage[T any](fileName string) *Storage[T] {
-	if _, err := os.Stat(fileName); os.IsNotExist(err) {
-		taskData := Task{
-			Description: "",
-			Status:      "todo",
-			CreatedAt:   time.Now(),
-			UpdatedAt:   nil,
-		}
-		initialTasks := []Task{taskData}
-
-		fileData, jsonErr := json.MarshalIndent(initialTasks, "", "    ")
-
-		if jsonErr != nil {
-			panic(jsonErr)
-		}
-
-		if createErr := os.WriteFile(fileName, fileData, 0644); createErr != nil {
-			panic(createErr)
-		}
-
-	}
-	return &Storage[T]{fileName}
+func NewStorage[T any](filename string) *Storage[T] {
+	return &Storage[T]{FileName: filename}
 }
 
-func (s *Storage[T]) Save(data T) error {
+func (storage *Storage[T]) Save(data T) error {
 	fileData, err := json.MarshalIndent(data, "", "    ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(s.FileName, fileData, 0644)
+
+	return os.WriteFile(storage.FileName, fileData, 0644)
 }
 
-func (s *Storage[T]) Load(data *T) error {
-	fileData, err := os.ReadFile(s.FileName)
+func (storage *Storage[T]) Load(data *T) error {
+	if _, err := os.Stat(storage.FileName); os.IsNotExist(err) {
+		return nil
+	}
+	fileData, err := os.ReadFile(storage.FileName)
+
 	if err != nil {
 		return err
 	}
+
 	return json.Unmarshal(fileData, data)
 }

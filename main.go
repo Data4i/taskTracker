@@ -3,14 +3,13 @@ package main
 func main() {
 	tasks := Tasks{}
 	storage := NewStorage[Tasks]("tasks.json")
-	loadErr := storage.Load(&tasks)
-	if loadErr != nil {
-		panic(loadErr)
+	err := storage.Load(&tasks)
+	if err != nil {
+		panic(err)
 	}
-	cmdFlags := NewCmdFlags()
+
+	cmdFlags := NewCMDFlags()
 	cmdFlags.Execute(&tasks)
-	saveErr := storage.Save(tasks)
-	if saveErr != nil {
-		panic(saveErr)
-	}
+	_ = storage.Save(tasks)
+
 }
