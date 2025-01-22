@@ -21,7 +21,7 @@ type Tasks []Task
 func (tasks *Tasks) Add(description string) {
 	task := Task{
 		Description: description,
-		Status:      "Todo",
+		Status:      "todo",
 		CreatedAt:   time.Now(),
 		UpdatedAt:   nil,
 	}
@@ -64,10 +64,10 @@ func (tasks *Tasks) UpdateStatus(idx int, status string) error {
 	}
 
 	switch status {
-	case "In Progress":
-		t[idx].Status = "In Progress"
-	case "Done":
-		t[idx].Status = "Done"
+	case "in-progress":
+		t[idx].Status = "in-progress"
+	case "done":
+		t[idx].Status = "done"
 	}
 
 	return nil
@@ -87,7 +87,16 @@ func (tasks *Tasks) print(taskStatus string) {
 	taskTable.SetRowLines(false)
 	taskTable.SetHeaders("#", "Description", "Status", "CreatedAt", "UpdatedAt")
 
-	for idx, task := range *tasks {
+	if len(*tasks) == 1 && (*tasks)[0].Description == "" {
+		fmt.Println("No tasks found")
+		return
+	}
+
+	t := *tasks
+	t = append(t[1:2], t[2:]...)
+
+	for idx, task := range t {
+
 		updatedAt := ""
 
 		if task.UpdatedAt != nil {
@@ -95,22 +104,23 @@ func (tasks *Tasks) print(taskStatus string) {
 		}
 
 		switch taskStatus {
-		case "In Progress":
-			if task.Status == "In Progress" {
+		case "in-progress":
+			if task.Status == "in-progress" {
 				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
 			}
-		case "Done":
-			if task.Status == "Done" {
+		case "done":
+			if task.Status == "done" {
 				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
 			}
-		case "Todo":
-			if task.Status == "Todo" {
+		case "todo":
+			if task.Status == "todo" {
 				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
 			}
 		case "":
 			taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.CreatedAt.Format(time.RFC1123), updatedAt)
 		default:
 			fmt.Println("Invalid task status command")
+			return
 		}
 	}
 	taskTable.Render()

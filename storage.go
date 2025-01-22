@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"time"
 )
 
 type Storage[T any] struct {
@@ -10,6 +11,26 @@ type Storage[T any] struct {
 }
 
 func NewStorage[T any](fileName string) *Storage[T] {
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		taskData := Task{
+			Description: "",
+			Status:      "todo",
+			CreatedAt:   time.Now(),
+			UpdatedAt:   nil,
+		}
+		initialTasks := []Task{taskData}
+
+		fileData, jsonErr := json.MarshalIndent(initialTasks, "", "    ")
+
+		if jsonErr != nil {
+			panic(jsonErr)
+		}
+
+		if createErr := os.WriteFile(fileName, fileData, 0644); createErr != nil {
+			panic(createErr)
+		}
+
+	}
 	return &Storage[T]{fileName}
 }
 
@@ -26,5 +47,5 @@ func (s *Storage[T]) Load(data *T) error {
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(fileData, &s)
+	return json.Unmarshal(fileData, data)
 }
