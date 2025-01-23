@@ -94,24 +94,7 @@ func (tasks *Tasks) UpdateStatus(idx int, status string) error {
 	return nil
 }
 
-func (tasks *Tasks) Print() {
-	taskTable := table.New(os.Stdout)
-	taskTable.SetRowLines(false)
-	taskTable.SetHeaders("#", "Description", "Status", "TimeCreated", "TimeUpdated")
-
-	for idx, task := range *tasks {
-		updatedTime := ""
-
-		if task.TimeUpdated != nil {
-			updatedTime = task.TimeUpdated.Format(time.RFC1123)
-		}
-
-		taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
-	}
-	taskTable.Render()
-}
-
-func (tasks *Tasks) PrintSelecting(status string) {
+func (tasks *Tasks) Print(status string) {
 	taskTable := table.New(os.Stdout)
 	taskTable.SetRowLines(false)
 	taskTable.SetHeaders("#", "Description", "Status", "TimeCreated", "TimeUpdated")
@@ -135,8 +118,11 @@ func (tasks *Tasks) PrintSelecting(status string) {
 			if (*tasks)[idx].Status == "done" {
 				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
 			}
+		case "all":
+			taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
 		default:
 			fmt.Printf("Status not supported: %s", status)
+			return
 		}
 	}
 	taskTable.Render()
