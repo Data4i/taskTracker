@@ -6,22 +6,27 @@ https://roadmap.sh/projects/task-tracker
 ## A Task Tracker CLI application
 ****
 
-_**-add string**_
+_**-add "description"**_
 
-* Add a new TODO title
+* Add a new TASK Description
 
-_**-del int**_
+_**-del "description"**_
 
-* Specify TODO to delete by index (default -1)
+* Specify Task to delete by index (default -1)
 
-_**-edit string**_
+_**-update "id new_description"**_
 
-* Edit a TODO title by index. id:new_title
+* Update description of a task 
 
 _**-list**_
+* **"-list all"** for all tasks
+* **"-list todo"** for tasks with todo status
+* **"-list in-progress"** for tasks with in-progress status
+* **"-list done"** for tasks with done status
 
-* List all TODOS
+_**-mark "id status"**_
 
-_**-toggle int**_
+* Update status of a task 
 
-* Specify TODO to be toggle Completed by index (default -1)
+* `Available Status -> done, todo, in-progress`
+
