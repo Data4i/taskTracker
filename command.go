@@ -39,6 +39,21 @@ func (cf *CMDFlags) Execute(tasks *Tasks) {
 	case cf.Update != "":
 		parts := strings.SplitN(cf.Update, " ", 2)
 		if len(parts) != 2 {
+			fmt.Printf("Error, Invalid format for edit. Use \"id new_description\" \n")
+			os.Exit(1)
+		}
+		idx, err := strconv.Atoi(parts[0])
+		if err != nil {
+			fmt.Println("Error, Invalid index for edit")
+			os.Exit(1)
+		}
+		err = tasks.UpdateDescription(idx, parts[1])
+		if err != nil {
+			fmt.Printf("Error, %s\n", err)
+		}
+	case cf.Edit != "":
+		parts := strings.SplitN(cf.Edit, " ", 2)
+		if len(parts) != 2 {
 			fmt.Printf("Error, Invalid format for edit. Use \"id new_status\" \n")
 			os.Exit(1)
 		}
@@ -48,21 +63,6 @@ func (cf *CMDFlags) Execute(tasks *Tasks) {
 			os.Exit(1)
 		}
 		err = tasks.UpdateStatus(idx, parts[1])
-		if err != nil {
-			fmt.Printf("Error, %s\n", err)
-		}
-	case cf.Edit != "":
-		parts := strings.SplitN(cf.Edit, " ", 2)
-		if len(parts) != 2 {
-			fmt.Printf("Error, Invalid format for edit. Use \"id new_title\" \n")
-			os.Exit(1)
-		}
-		idx, err := strconv.Atoi(parts[0])
-		if err != nil {
-			fmt.Println("Error, Invalid index for edit")
-			os.Exit(1)
-		}
-		err = tasks.UpdateDescription(idx, parts[1])
 		if err != nil {
 			fmt.Printf("Error, %s\n", err)
 		}

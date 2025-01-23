@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/aquasecurity/table"
 	"os"
@@ -58,14 +59,37 @@ func (tasks *Tasks) UpdateDescription(idx int, description string) error {
 	return nil
 }
 
+func statusIsPresent(status string) bool {
+	statusTypes := []string{
+		"todo",
+		"in-progress",
+		"done",
+	}
+	present := false
+	for _, t := range statusTypes {
+		if status == t {
+			present = true
+		}
+	}
+	return present
+
+}
+
 func (tasks *Tasks) UpdateStatus(idx int, status string) error {
 	t := *tasks
 	if err := t.validateIndex(idx); err != nil {
 		return err
 	}
-	updatedTime := time.Now()
-	t[idx].TimeUpdated = &updatedTime
-	t[idx].Status = status
+
+	isPresent := statusIsPresent(status)
+	if isPresent {
+		updatedTime := time.Now()
+		t[idx].TimeUpdated = &updatedTime
+
+		t[idx].Status = status
+	} else {
+		return errors.New("invalid status")
+	}
 
 	return nil
 }
