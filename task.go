@@ -46,6 +46,30 @@ func (tasks *Tasks) Delete(idx int) error {
 	return nil
 }
 
+func (tasks *Tasks) UpdateDescription(idx int, description string) error {
+	t := *tasks
+	if err := t.validateIndex(idx); err != nil {
+		return err
+	}
+
+	updatedTime := time.Now()
+	t[idx].TimeUpdated = &updatedTime
+	t[idx].Description = description
+	return nil
+}
+
+func (tasks *Tasks) UpdateStatus(idx int, status string) error {
+	t := *tasks
+	if err := t.validateIndex(idx); err != nil {
+		return err
+	}
+	updatedTime := time.Now()
+	t[idx].TimeUpdated = &updatedTime
+	t[idx].Status = status
+
+	return nil
+}
+
 func (tasks *Tasks) Print() {
 	taskTable := table.New(os.Stdout)
 	taskTable.SetRowLines(false)
@@ -59,6 +83,37 @@ func (tasks *Tasks) Print() {
 		}
 
 		taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
+	}
+	taskTable.Render()
+}
+
+func (tasks *Tasks) PrintSelecting(status string) {
+	taskTable := table.New(os.Stdout)
+	taskTable.SetRowLines(false)
+	taskTable.SetHeaders("#", "Description", "Status", "TimeCreated", "TimeUpdated")
+	for idx, task := range *tasks {
+		updatedTime := ""
+
+		if task.TimeUpdated != nil {
+			updatedTime = task.TimeUpdated.Format(time.RFC1123)
+		}
+
+		switch status {
+		case "todo":
+			if (*tasks)[idx].Status == "todo" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
+			}
+		case "in-progress":
+			if (*tasks)[idx].Status == "in-progress" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
+			}
+		case "done":
+			if (*tasks)[idx].Status == "done" {
+				taskTable.AddRow(strconv.Itoa(idx), task.Description, task.Status, task.TimeCreated.Format(time.RFC1123), updatedTime)
+			}
+		default:
+			fmt.Printf("Status not supported: %s", status)
+		}
 	}
 	taskTable.Render()
 }

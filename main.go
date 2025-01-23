@@ -2,6 +2,7 @@ package main
 
 func main() {
 	tasks := Tasks{}
+
 	storage := NewStorage[Tasks]("tasks.json")
 	err := storage.Load(&tasks)
 	if err != nil {
